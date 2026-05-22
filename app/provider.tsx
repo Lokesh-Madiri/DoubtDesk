@@ -87,18 +87,29 @@ export function Provider({ children }: { children: React.ReactNode }) {
     }, [pathname, searchParams]);
 
     useEffect(() => {
-        const handleAnchorClick = (event: MouseEvent) => {
-            const target = event.target as HTMLElement;
-            const anchor = target.closest("a");
-
-            if (anchor && anchor.href && anchor.target !== "_blank") {
+            const handleAnchorClick = (event: MouseEvent) => {
+                const target = event.target;
+                
+                if (!(target instanceof Element)) {
+                    return;
+                }
+            
+                const anchor = target.closest("a");
+            
+                if (!(anchor instanceof HTMLAnchorElement) || !anchor.href || anchor.target === "_blank") {
+                    return;
+                }
+            
                 const targetUrl = new URL(anchor.href);
                 const currentUrl = new URL(window.location.href);
-
-                if (targetUrl.origin === currentUrl.origin && targetUrl.pathname !== currentUrl.pathname) {
+            
+                if (
+                    targetUrl.origin === currentUrl.origin &&
+                    (targetUrl.pathname !== currentUrl.pathname || targetUrl.search !== currentUrl.search)
+                ) {
                     setIsNavigating(true);
                 }
-            }
+            };
         };
 
         document.addEventListener("click", handleAnchorClick);
