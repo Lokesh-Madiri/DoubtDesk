@@ -17,22 +17,36 @@ export default function TeacherDashboard() {
     const classroomId = searchParams.get("classroomId");
 
     useEffect(() => {
+        // refetch when classroomId changes
         if (!classroomId) {
             setLoading(false);
+            setData(null);
             return;
         }
 
+        setLoading(true);
+        setData(null);
+
         fetch(`/api/teacher/insights?classroomId=${classroomId}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw res;
+                return res.json();
+            })
             .then(json => {
                 setData(json);
                 setLoading(false);
             })
-            .catch(err => {
-                console.error(err);
+            .catch(async (err) => {
+                try {
+                    const body = err && (await err.json?.());
+                    console.error('Failed to fetch insights:', body || err);
+                } catch (e) {
+                    console.error('Failed to fetch insights:', err);
+                }
+                setData(null);
                 setLoading(false);
             });
-    }, []);
+    }, [classroomId]);
 
     if (loading) {
         return (

@@ -49,6 +49,7 @@ describe('Reply Vote API Endpoint', () => {
 
     it('uses the authenticated Clerk identity instead of the client userName', async () => {
         currentUserMock.mockResolvedValue({
+            id: 'clerk_user_id',
             username: null,
             fullName: 'Clerk Teacher',
             firstName: 'Clerk',
@@ -75,7 +76,7 @@ describe('Reply Vote API Endpoint', () => {
         expect(json.hasUpvoted).toBe(true);
         expect(dbMock.insert).toHaveBeenCalled();
         expect(dbMock.insert.mock.results[0].value.values).toHaveBeenCalledWith({
-            userName: 'Clerk Teacher',
+            userName: 'clerk_user_id',
             replyId: 1,
         });
     });
